@@ -1,0 +1,24 @@
+{
+  "source_csv": "C:\\Users\\Hari\\OneDrive - University of Glasgow\\Desktop\\New\\NexusOcean\\data\\emails.csv",
+  "slice_csv": "C:\\Users\\Hari\\OneDrive - University of Glasgow\\Desktop\\New\\NexusOcean\\data\\laptop_slice\\emails.csv",
+  "window_start": "2000-11",
+  "window_end": "2001-03",
+  "month_span": 6,
+  "threads_selected": 10,
+  "messages_selected": 300,
+  "attachment_messages": 47,
+  "indexed_text_bytes": 6116728,
+  "indexed_text_mb": 5.83,
+  "thread_message_counts": {
+    "entouch newsletter": 121,
+    "energy issues": 117,
+    "individual.com - news from a friend!": 16,
+    "dinner invitation": 12,
+    "your alamo.com reservation confirmation": 8,
+    "florida ballots": 7,
+    "reactions log-in password": 7,
+    "dj ferc to lower price cap in calif pwrorder-commissioners": 6,
+    "other attendees for meeting on monday, november 27?": 4,
+    "enron in action 03.19.01": 2
+  }
+}

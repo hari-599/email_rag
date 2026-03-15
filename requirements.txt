@@ -1,0 +1,5 @@
+kagglehub
+flask
+transformers
+sentencepiece
+torch

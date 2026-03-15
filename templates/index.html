@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Email Thread Chat</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      margin: 24px;
+      max-width: 960px;
+    }
+    .section {
+      margin-bottom: 20px;
+    }
+    label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: 600;
+    }
+    select, textarea, button {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 8px;
+      font: inherit;
+    }
+    textarea {
+      min-height: 110px;
+      resize: vertical;
+    }
+    button {
+      margin-top: 8px;
+      cursor: pointer;
+    }
+    #chatLog, #debugPanel {
+      border: 1px solid #ccc;
+      padding: 12px;
+      min-height: 160px;
+      white-space: pre-wrap;
+    }
+    #debugPanel {
+      font-family: monospace;
+      font-size: 13px;
+    }
+  </style>
+</head>
+<body>
+  <div class="section">
+    <label for="threadSelect">Thread</label>
+    <select id="threadSelect"></select>
+    <label style="margin-top: 8px;">
+      <input id="outsideToggle" type="checkbox">
+      Search outside thread
+    </label>
+    <button id="startBtn">Start Session</button>
+  </div>
+
+  <div class="section">
+    <label for="question">Question</label>
+    <textarea id="question" placeholder="Ask a question about the active thread"></textarea>
+    <button id="askBtn">Ask</button>
+  </div>
+
+  <div class="section">
+    <label>Chat</label>
+    <div id="chatLog"></div>
+  </div>
+
+  <div class="section">
+    <label>Debug</label>
+    <div id="debugPanel">No request yet.</div>
+  </div>
+
+  <script>
+    let sessionId = null;
+
+    async function loadThreads() {
+      const response = await fetch('/threads');
+      const threads = await response.json();
+      const select = document.getElementById('threadSelect');
+      select.innerHTML = '';
+
+      threads.forEach(thread => {
+        const option = document.createElement('option');
+        option.value = thread.thread_id;
+        option.textContent = `${thread.thread_id} (${thread.message_count})`;
+        select.appendChild(option);
+      });
+    }
+
+    async function startSession() {
+      const threadId = document.getElementById('threadSelect').value;
+      const response = await fetch('/start_session', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ thread_id: threadId })
+      });
+      const data = await response.json();
+      sessionId = data.session_id;
+      document.getElementById('chatLog').textContent = `Session started for ${data.thread_id}\n`;
+      document.getElementById('debugPanel').textContent = JSON.stringify(data, null, 2);
+    }
+
+    async function askQuestion() {
+      if (!sessionId) {
+        alert('Start a session first.');
+        return;
+      }
+
+      const text = document.getElementById('question').value;
+      const outside = document.getElementById('outsideToggle').checked;
+
+      const response = await fetch(`/ask?search_outside_thread=${outside}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ session_id: sessionId, text })
+      });
+
+      const data = await response.json();
+      const chatLog = document.getElementById('chatLog');
+      chatLog.textContent += `User: ${text}\nBot: ${data.answer}\n\n`;
+      document.getElementById('debugPanel').textContent = JSON.stringify(data, null, 2);
+    }
+
+    document.getElementById('startBtn').addEventListener('click', startSession);
+    document.getElementById('askBtn').addEventListener('click', askQuestion);
+
+    loadThreads();
+  </script>
+</body>
+</html>
