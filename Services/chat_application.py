@@ -95,15 +95,18 @@ class Chat_Application:
             session = self.session_manager.get_session(session_id)
             rewrite_payload = self.query_rewrite.rewrite_query(session_id, text)
 
+            # Always prefer the active thread first. Global search is only a fallback
+            # when the user explicitly enables it and the focused thread has no hits.
             retrieved = self.retriever.search(
                 rewrite_payload["rewrite"],
-                thread_id=None if search_outside_thread else session.thread_id,
+                thread_id=session.thread_id,
                 top_k=top_k,
             )
 
-            if not retrieved and not search_outside_thread:
+            if not retrieved:
                 retrieved = self.retriever.get_thread_chunks(session.thread_id, top_k=top_k)
-            elif not retrieved and search_outside_thread:
+
+            if not retrieved and search_outside_thread:
                 retrieved = self.retriever.search(rewrite_payload["rewrite"], thread_id=None, top_k=top_k)
 
             answer_payload = self.answer_generator.answer(

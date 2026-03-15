@@ -14,7 +14,7 @@ class Grounded_Answer_Generator:
     PEOPLE_RE = re.compile(r"\b(who is involved|who all are involved|who is talking|participants|people involved|who sent)\b", re.IGNORECASE)
     AMOUNT_RE = re.compile(r"\b(amount|price|cost|value|cap|rate|how much|what is new price|new price)\b", re.IGNORECASE)
     DATE_RE = re.compile(r"\b(when|date|sent|approved on|when was)\b", re.IGNORECASE)
-    DECISION_RE = re.compile(r"\b(decision|proposal|request|asked|what.*discussed|what.*proposal|what.*request)\b", re.IGNORECASE)
+    DECISION_RE = re.compile(r"\b(decision|proposal|request|asked|asking|what.*discussed|what.*proposal|what.*request)\b", re.IGNORECASE)
     WHY_RE = re.compile(r"\bwhy\b", re.IGNORECASE)
     MEETING_RE = re.compile(r"\bwhat meeting|which meeting|meeting referred to|meeting mentioned\b", re.IGNORECASE)
     LOCATION_RE = re.compile(r"\bwhere\b|\blocation\b|\bconnected to\b", re.IGNORECASE)
@@ -63,6 +63,16 @@ class Grounded_Answer_Generator:
 
     def _is_location_request(self, query):
         return bool(self.LOCATION_RE.search(query or ""))
+
+    def _is_valid_compressed_answer(self, text):
+        normalized = (text or "").strip()
+        if not normalized:
+            return False
+        if normalized.lower() in {"true", "false", "yes", "no"}:
+            return False
+        if len(normalized.split()) < 4:
+            return False
+        return True
 
     def _best_sentences(self, query, item, max_sentences=2):
         query_terms = set(self._tokenize(query))
@@ -434,7 +444,7 @@ class Grounded_Answer_Generator:
         if self.t5_helper.available:
             prompt = "summarize the following evidence in 2 concise sentences: " + " ".join(summary_points[:3])
             compressed = self.t5_helper.generate(prompt, max_new_tokens=60)
-            if compressed:
+            if self._is_valid_compressed_answer(compressed):
                 citation_suffix = self._primary_citations(retrieved_items)
                 return f"{compressed} {citation_suffix}".strip(), citations
 
@@ -532,7 +542,7 @@ class Grounded_Answer_Generator:
                 f"question: {query} evidence: {evidence_text}"
             )
             compressed = self.t5_helper.generate(prompt, max_new_tokens=64)
-            if compressed:
+            if self._is_valid_compressed_answer(compressed):
                 citation_suffix = self._primary_citations(retrieved_items)
                 answer = f"{compressed} {citation_suffix}".strip()
 
