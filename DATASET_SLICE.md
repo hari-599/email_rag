@@ -22,10 +22,21 @@
 
 - Threads: `10`
 - Messages: `300`
-- Attachment-bearing messages: `47`
+- Attachment-bearing messages in the source email text: `47`
 - Approximate indexed text size: `5.83 MB`
 
 These values come from `data/laptop_slice/summary.json`.
+
+## Attachment Usage In This Project
+
+- The slice includes some emails whose raw MIME text indicates that an attachment existed.
+- Those attachment indicators were only used during slice profiling and reporting.
+- The current system does **not** ingest standalone attachment files.
+- Retrieval and answer generation are based only on:
+  - email headers
+  - email body text
+  - cleaned email content
+- So, when this project reports citations, they are email-message citations, not attachment-content citations.
 
 ## Preprocessing
 
@@ -35,6 +46,7 @@ These values come from `data/laptop_slice/summary.json`.
 - Increased Python CSV field size handling to support very large raw messages
 - Marked a message as attachment-bearing when explicit attachment indicators were present in the raw MIME text, such as `Content-Disposition: attachment`, `filename=`, or `name=`
 - Limited the final slice to a compact size suitable for laptop use and interview demos
+- Did not extract, parse, OCR, or index attachment contents; only the parent email text was used downstream
 
 ## License / Usage Note
 

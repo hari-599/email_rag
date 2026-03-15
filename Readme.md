@@ -15,6 +15,12 @@ Small, grounded email-thread RAG prototype built on a laptop-sized Enron slice.
 - exposes a Flask API and tiny built-in UI
 - writes one JSON trace record per turn to `runs/<timestamp>/trace.jsonl`
 
+## What It Does Not Do
+
+- It does **not** ingest standalone attachment files.
+- It does **not** answer from attachment contents such as PDF, DOC, image, or scanned files.
+- If an email mentions an attachment, that signal may still appear in the raw email text, but retrieval is grounded only in the email message content itself.
+
 ## Run Locally
 
 ```powershell
@@ -79,4 +85,5 @@ docker compose up --build
 - Dataset details are in `DATASET_SLICE.md`
 - Current grounding supports email citations:
   - `[msg: <message_id>]`
-- Attachment/page citations are structurally supported but standalone attachment ingestion is not implemented yet
+- Attachment/page citation fields exist in the trace and response schema, but standalone attachment ingestion is not implemented in this version
+- In practice, this project uses email-message evidence only, not attachment-file evidence
