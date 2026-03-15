@@ -167,3 +167,8 @@ docker compose up --build
   - `[msg: <message_id>]`
 - Attachment/page citation fields exist in the trace and response schema, but standalone attachment ingestion is not implemented in this version
 - In practice, this project uses email-message evidence only, not attachment-file evidence
+
+## Acknowledgement Of AI Tooling
+
+- AI-assisted tools such as GitHub Copilot and Codex were used during development for documentation support and syntax-level checking
+- System design decisions, implementation choices, testing, debugging, and final review were still performed within the project workflow by the author
